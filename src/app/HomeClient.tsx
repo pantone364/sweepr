@@ -1,20 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Sweepstake, Testimonial } from "@/lib/supabase/types";
 
 interface Props {
   sweepstakes: Sweepstake[]
   testimonials: Testimonial[]
-  countries: { code: string; name: string }[]
 }
 
-export default function HomeClient({ sweepstakes, testimonials, countries }: Props) {
+// Location-specific content
+const LOCATION_CONTENT: Record<string, {
+  heroHeading: string;
+  heroParagraph: string;
+  aboutParagraph: string;
+  testimonialSubheading: string;
+  footerTagline: string;
+}> = {
+  AU: {
+    heroHeading: "Australians' favourite sweepstakes",
+    heroParagraph: "Discover verified giveaways tailored to you. Enter in minutes, win prizes that matter, and join thousands of Australians winning every day.",
+    aboutParagraph: "Sweepr works with sweepstake holders all across Australia and beyond to find and promote the best sweepstakes and giveaways currently available. Our team verifies each opportunity to ensure legitimacy, so you can enter with confidence. We personalise recommendations based on your location and preferences, giving you access to relevant prizes with higher odds of winning.",
+    testimonialSubheading: "Join thousands of happy winners across Australia",
+    footerTagline: "Australia's trusted sweepstakes platform",
+  },
+  US: {
+    heroHeading: "Americans' favorite sweepstakes",
+    heroParagraph: "Discover verified giveaways tailored to you. Enter in minutes, win prizes that matter, and join thousands of Americans winning every day.",
+    aboutParagraph: "Sweepr works with sweepstake holders all across the USA and beyond to find and promote the best sweepstakes and giveaways currently available. Our team verifies each opportunity to ensure legitimacy, so you can enter with confidence. We personalize recommendations based on your location and preferences, giving you access to relevant prizes with higher odds of winning.",
+    testimonialSubheading: "Join thousands of happy winners across the USA",
+    footerTagline: "America's trusted sweepstakes platform",
+  },
+  UK: {
+    heroHeading: "Great Britain's favourite sweepstakes",
+    heroParagraph: "Discover verified giveaways tailored to you. Enter in minutes, win prizes that matter, and join thousands of Brits winning every day.",
+    aboutParagraph: "Sweepr works with sweepstake holders all across Great Britain and beyond to find and promote the best sweepstakes and giveaways currently available. Our team verifies each opportunity to ensure legitimacy, so you can enter with confidence. We personalise recommendations based on your location and preferences, giving you access to relevant prizes with higher odds of winning.",
+    testimonialSubheading: "Join thousands of happy winners across Great Britain",
+    footerTagline: "Great Britain's trusted sweepstakes platform",
+  },
+}
+
+export default function HomeClient({ sweepstakes, testimonials }: Props) {
   const [selectedCountry, setSelectedCountry] = useState("AU");
+
+  // Auto-detect country on mount
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const res = await fetch('/api/geo');
+        const data = await res.json();
+        if (data.country && ['AU', 'US', 'UK'].includes(data.country)) {
+          setSelectedCountry(data.country);
+        }
+      } catch (error) {
+        console.error('Failed to detect country:', error);
+      }
+    };
+    detectCountry();
+  }, []);
 
   const filteredSweepstakes = sweepstakes.filter((item) =>
     item.countries?.includes(selectedCountry)
   );
+
+  const filteredTestimonials = testimonials.filter((item) =>
+    item.countries?.includes(selectedCountry)
+  );
+
+  // Get location-specific content (fallback to AU)
+  const content = LOCATION_CONTENT[selectedCountry] || LOCATION_CONTENT.AU;
 
   return (
     <div className="min-h-screen bg-white">
@@ -38,10 +91,10 @@ export default function HomeClient({ sweepstakes, testimonials, countries }: Pro
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-              Australians' favourite sweepstakes
+              {content.heroHeading}
             </h2>
             <p className="mt-6 text-lg sm:text-xl text-white/80 max-w-xl mx-auto">
-              Discover verified giveaways tailored to you. Enter in minutes, win prizes that matter, and join thousands of Australians winning every day.
+              {content.heroParagraph}
             </p>
             <div className="mt-8">
               <a
@@ -63,7 +116,7 @@ export default function HomeClient({ sweepstakes, testimonials, countries }: Pro
               About Sweepr
             </h3>
             <p className="text-lg text-muted leading-relaxed">
-              Sweepr works with sweepstake holders all across Australia and beyond to find and promote the best sweepstakes and giveaways currently available. Our team verifies each opportunity to ensure legitimacy, so you can enter with confidence. We personalise recommendations based on your location and preferences, giving you access to relevant prizes with higher odds of winning.
+              {content.aboutParagraph}
             </p>
           </div>
 
@@ -111,36 +164,13 @@ export default function HomeClient({ sweepstakes, testimonials, countries }: Pro
         </div>
       </section>
 
-      {/* Country Selection & Sweepstakes Grid */}
+      {/* Sweepstakes Grid */}
       <section id="sweepstakes" className="py-16 sm:py-24 bg-secondary">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h3 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               Find Sweepstakes Near You
             </h3>
-            <p className="text-lg text-muted mb-8">
-              Select your country to discover available sweepstakes
-            </p>
-
-            {/* Country Dropdown */}
-            <div className="inline-block relative">
-              <select
-                value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
-                className="appearance-none bg-white border-2 border-border rounded-full px-8 py-4 pr-12 text-lg font-medium text-foreground cursor-pointer hover:border-primary focus:border-primary focus:outline-none transition-colors"
-              >
-                {countries.map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-muted">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
           </div>
 
           {/* Sweepstakes Grid */}
@@ -148,7 +178,9 @@ export default function HomeClient({ sweepstakes, testimonials, countries }: Pro
             {filteredSweepstakes.map((sweepstake) => (
               <a
                 key={sweepstake.id}
-                href="#"
+                href={sweepstake.url || '#'}
+                target={sweepstake.url ? '_blank' : undefined}
+                rel={sweepstake.url ? 'noopener noreferrer' : undefined}
                 className="group relative aspect-square bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <div
@@ -179,13 +211,13 @@ export default function HomeClient({ sweepstakes, testimonials, countries }: Pro
               What Our Winners Say
             </h3>
             <p className="text-lg text-muted">
-              Join thousands of happy winners across Australia
+              {content.testimonialSubheading}
             </p>
           </div>
 
-          {testimonials.length > 0 ? (
+          {filteredTestimonials.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial) => (
+              {filteredTestimonials.map((testimonial) => (
                 <div
                   key={testimonial.id}
                   className="bg-secondary rounded-2xl p-8 hover:shadow-lg transition-shadow"
@@ -231,7 +263,7 @@ export default function HomeClient({ sweepstakes, testimonials, countries }: Pro
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted text-lg">No testimonials available yet.</p>
+              <p className="text-muted text-lg">No testimonials available for this region yet.</p>
             </div>
           )}
         </div>
@@ -243,7 +275,7 @@ export default function HomeClient({ sweepstakes, testimonials, countries }: Pro
           <div className="text-center">
             <h2 className="text-2xl font-black tracking-tight mb-4">SWEEPR</h2>
             <p className="text-white/60 mb-6">
-              Australia's trusted sweepstakes platform
+              {content.footerTagline}
             </p>
             <div className="flex justify-center gap-6 text-sm text-white/60">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>

@@ -9,7 +9,7 @@ import type { Sweepstake } from '@/lib/supabase/types'
 
 const COUNTRIES = [
   { code: 'AU', name: 'Australia' },
-  { code: 'NZ', name: 'New Zealand' },
+  { code: 'US', name: 'United States' },
   { code: 'UK', name: 'United Kingdom' },
 ]
 
@@ -18,6 +18,7 @@ export default function EditSweepstakePage({ params }: { params: Promise<{ id: s
   const [sweepstake, setSweepstake] = useState<Sweepstake | null>(null)
   const [name, setName] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [url, setUrl] = useState('')
   const [countries, setCountries] = useState<string[]>([])
   const [active, setActive] = useState(true)
   const [loading, setLoading] = useState(true)
@@ -40,6 +41,7 @@ export default function EditSweepstakePage({ params }: { params: Promise<{ id: s
         setSweepstake(data)
         setName(data.name)
         setImageUrl(data.image_url || '')
+        setUrl(data.url || '')
         setCountries(data.countries || [])
         setActive(data.active)
       }
@@ -65,6 +67,7 @@ export default function EditSweepstakePage({ params }: { params: Promise<{ id: s
       .update({
         name,
         image_url: imageUrl || null,
+        url: url || null,
         countries,
         active,
         updated_at: new Date().toISOString(),
@@ -128,6 +131,19 @@ export default function EditSweepstakePage({ params }: { params: Promise<{ id: s
               onChange={(e) => setName(e.target.value)}
               required
               className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-1">
+              URL (link to sweepstake)
+            </label>
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+              placeholder="https://example.com/sweepstake"
             />
           </div>
 

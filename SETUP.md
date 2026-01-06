@@ -19,7 +19,8 @@ CREATE TABLE sweepstakes (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   image_url TEXT,
-  countries TEXT[] DEFAULT '{}',
+  url TEXT,  -- Link to the sweepstake
+  countries TEXT[] DEFAULT '{}',  -- AU, US, UK
   sort_order INTEGER DEFAULT 0,
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -34,6 +35,7 @@ CREATE TABLE testimonials (
   location TEXT NOT NULL,
   rating INTEGER DEFAULT 5 CHECK (rating >= 1 AND rating <= 5),
   avatar_url TEXT,
+  countries TEXT[] DEFAULT '{}',  -- AU, US, UK
   sort_order INTEGER DEFAULT 0,
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -172,9 +174,29 @@ After your domain is live:
 ## Admin Panel Features
 
 - **Dashboard**: Overview of sweepstakes and testimonials count
-- **Sweepstakes**: Add, edit, delete, reorder, toggle active status
-- **Testimonials**: Add, edit, delete, reorder, star ratings
+- **Sweepstakes**: Add, edit, delete, reorder, toggle active status, set URL link, assign countries
+- **Testimonials**: Add, edit, delete, reorder, star ratings, assign countries
 - **Image Upload**: Drag & drop to Supabase Storage
 - **Authentication**: Email/password login
+- **Geolocation**: Auto-detects visitor country (AU, US, UK) and filters content
 
 Access admin at: `https://yourdomain.com/admin`
+
+---
+
+## Geolocation
+
+The site automatically detects the visitor's country using Vercel's built-in geo headers (free, no external API needed).
+
+Supported countries:
+- **AU** - Australia
+- **US** - United States
+- **UK** - United Kingdom (Great Britain)
+
+The page content adapts based on the detected country:
+- Hero heading and text
+- Filtered sweepstakes by country
+- Filtered testimonials by country
+- Footer tagline
+
+Visitors can also manually change their country using the dropdown.

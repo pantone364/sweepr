@@ -1,12 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import HomeClient from './HomeClient'
 
-const countries = [
-  { code: "AU", name: "Australia" },
-  { code: "NZ", name: "New Zealand" },
-  { code: "UK", name: "United Kingdom" },
-]
-
 export default async function Home() {
   const supabase = await createClient()
 
@@ -30,7 +24,6 @@ export default async function Home() {
     <HomeClient
       sweepstakes={sweepstakes}
       testimonials={testimonials}
-      countries={countries}
     />
   )
 }

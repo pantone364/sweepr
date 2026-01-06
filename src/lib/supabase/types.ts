@@ -2,6 +2,7 @@ export interface Sweepstake {
   id: string
   name: string
   image_url: string | null
+  url: string | null
   countries: string[]
   sort_order: number
   active: boolean
@@ -16,6 +17,7 @@ export interface Testimonial {
   location: string
   rating: number
   avatar_url: string | null
+  countries: string[]
   sort_order: number
   active: boolean
   created_at: string

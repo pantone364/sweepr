@@ -7,6 +7,12 @@ import { createClient } from '@/lib/supabase/client'
 import ImageUpload from '@/components/admin/ImageUpload'
 import type { Testimonial } from '@/lib/supabase/types'
 
+const COUNTRIES = [
+  { code: 'AU', name: 'Australia' },
+  { code: 'US', name: 'United States' },
+  { code: 'UK', name: 'United Kingdom' },
+]
+
 export default function EditTestimonialPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [testimonial, setTestimonial] = useState<Testimonial | null>(null)
@@ -15,6 +21,7 @@ export default function EditTestimonialPage({ params }: { params: Promise<{ id: 
   const [location, setLocation] = useState('')
   const [rating, setRating] = useState(5)
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [countries, setCountries] = useState<string[]>([])
   const [active, setActive] = useState(true)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -39,6 +46,7 @@ export default function EditTestimonialPage({ params }: { params: Promise<{ id: 
         setLocation(data.location)
         setRating(data.rating)
         setAvatarUrl(data.avatar_url || '')
+        setCountries(data.countries || [])
         setActive(data.active)
       }
       setLoading(false)
@@ -60,6 +68,7 @@ export default function EditTestimonialPage({ params }: { params: Promise<{ id: 
         location,
         rating,
         avatar_url: avatarUrl || null,
+        countries,
         active,
         updated_at: new Date().toISOString(),
       })
@@ -186,6 +195,30 @@ export default function EditTestimonialPage({ params }: { params: Promise<{ id: 
               currentUrl={avatarUrl}
               onUpload={setAvatarUrl}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              Countries
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {COUNTRIES.map((country) => (
+                <button
+                  key={country.code}
+                  type="button"
+                  onClick={() => setCountries((prev) =>
+                    prev.includes(country.code) ? prev.filter((c) => c !== country.code) : [...prev, country.code]
+                  )}
+                  className={`px-3 py-2 rounded-md border transition-colors ${
+                    countries.includes(country.code)
+                      ? 'bg-[var(--primary)] text-white border-[var(--primary)]'
+                      : 'bg-white text-[var(--foreground)] border-[var(--border)] hover:border-[var(--primary)]'
+                  }`}
+                >
+                  {country.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

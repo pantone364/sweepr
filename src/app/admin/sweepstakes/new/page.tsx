@@ -8,13 +8,14 @@ import ImageUpload from '@/components/admin/ImageUpload'
 
 const COUNTRIES = [
   { code: 'AU', name: 'Australia' },
-  { code: 'NZ', name: 'New Zealand' },
+  { code: 'US', name: 'United States' },
   { code: 'UK', name: 'United Kingdom' },
 ]
 
 export default function NewSweepstakePage() {
   const [name, setName] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [url, setUrl] = useState('')
   const [countries, setCountries] = useState<string[]>([])
   const [active, setActive] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -46,6 +47,7 @@ export default function NewSweepstakePage() {
     const { error: insertError } = await supabase.from('sweepstakes').insert({
       name,
       image_url: imageUrl || null,
+      url: url || null,
       countries,
       active,
       sort_order: sortOrder,
@@ -93,6 +95,19 @@ export default function NewSweepstakePage() {
               required
               className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
               placeholder="$500 Visa Gift Card"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-1">
+              URL (link to sweepstake)
+            </label>
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+              placeholder="https://example.com/sweepstake"
             />
           </div>
 

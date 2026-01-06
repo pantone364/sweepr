@@ -6,12 +6,19 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import ImageUpload from '@/components/admin/ImageUpload'
 
+const COUNTRIES = [
+  { code: 'AU', name: 'Australia' },
+  { code: 'US', name: 'United States' },
+  { code: 'UK', name: 'United Kingdom' },
+]
+
 export default function NewTestimonialPage() {
   const [quote, setQuote] = useState('')
   const [name, setName] = useState('')
   const [location, setLocation] = useState('')
   const [rating, setRating] = useState(5)
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [countries, setCountries] = useState<string[]>([])
   const [active, setActive] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +46,7 @@ export default function NewTestimonialPage() {
       location,
       rating,
       avatar_url: avatarUrl || null,
+      countries,
       active,
       sort_order: sortOrder,
     })
@@ -151,6 +159,30 @@ export default function NewTestimonialPage() {
               currentUrl={avatarUrl}
               onUpload={setAvatarUrl}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--foreground)] mb-2">
+              Countries
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {COUNTRIES.map((country) => (
+                <button
+                  key={country.code}
+                  type="button"
+                  onClick={() => setCountries((prev) =>
+                    prev.includes(country.code) ? prev.filter((c) => c !== country.code) : [...prev, country.code]
+                  )}
+                  className={`px-3 py-2 rounded-md border transition-colors ${
+                    countries.includes(country.code)
+                      ? 'bg-[var(--primary)] text-white border-[var(--primary)]'
+                      : 'bg-white text-[var(--foreground)] border-[var(--border)] hover:border-[var(--primary)]'
+                  }`}
+                >
+                  {country.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
