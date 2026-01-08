@@ -220,7 +220,7 @@ export default function HomeClient({ sweepstakes, testimonials }: Props) {
               {filteredTestimonials.map((testimonial) => (
                 <div
                   key={testimonial.id}
-                  className="bg-secondary rounded-2xl p-8 hover:shadow-lg transition-shadow"
+                  className="bg-secondary rounded-2xl p-8 hover:shadow-lg transition-shadow flex flex-col"
                 >
                   {/* Stars */}
                   <div className="flex gap-1 mb-4">
@@ -236,11 +236,11 @@ export default function HomeClient({ sweepstakes, testimonials }: Props) {
                     ))}
                   </div>
 
-                  <p className="text-foreground mb-6 leading-relaxed">
+                  <p className="text-foreground mb-6 leading-relaxed flex-grow">
                     "{testimonial.quote}"
                   </p>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mt-auto">
                     <div>
                       <p className="font-semibold text-foreground">{testimonial.name}</p>
                       <p className="text-sm text-muted">{testimonial.location}</p>
